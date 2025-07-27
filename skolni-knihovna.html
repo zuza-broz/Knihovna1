@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Školní knihovna</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body { font-family: sans-serif; background: #6b5bd2; color: #000; text-align: center; padding: 20px; }
+    .box { background: white; margin: 20px auto; padding: 20px; border-radius: 12px; max-width: 400px; }
+    input, button { padding: 10px; margin: 10px; width: 80%; border-radius: 6px; border: 1px solid #ccc; }
+    .action-button { display: inline-block; width: 40%; margin: 5px; }
+    #reader { width: 100%; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>📚 Školní knihovna</h1>
+  <p>Půjčování knih pomocí QR kódů</p>
+
+  <div class="box">
+    <h2>1. Kdo si půjčuje/vrací knihu?</h2>
+    <input id="studentName" type="text" placeholder="Klikněte sem nebo napište">
+    <button onclick="startScan('student')">Skenovat QR kód žáka</button>
+  </div>
+
+  <div class="box">
+    <h2>2. Co chceš udělat?</h2>
+    <button class="action-button" onclick="setAction('Půjčuji si')">🏠 Půjčuji si</button>
+    <button class="action-button" onclick="setAction('Vracím')">🏫 Vracím</button>
+  </div>
+
+  <div class="box">
+    <h2>3. Jakou knihu?</h2>
+    <input id="bookTitle" type="text" placeholder="Klikněte sem nebo napište">
+    <button onclick="startScan('book')">Skenovat QR kód knihy</button>
+  </div>
+
+  <div class="box">
+    <button onclick="submitForm()">Odeslat</button>
+    <div id="reader" style="display:none"></div>
+  </div>
+
+  <script>
+    let selectedAction = "";
+    let currentScanTarget = "";
+
+    function setAction(action) {
+      selectedAction = action;
+      alert("Zvoleno: " + action);
+    }
+
+    function startScan(target) {
+      currentScanTarget = target;
+      document.getElementById("reader").style.display = "block";
+      const html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start({ facingMode: "environment" }, {
+        fps: 10,
+        qrbox: 250
+      }, (decodedText) => {
+        if (target === 'student') {
+          document.getElementById("studentName").value = decodedText;
+        } else if (target === 'book') {
+          document.getElementById("bookTitle").value = decodedText;
+        }
+        html5QrCode.stop();
+        document.getElementById("reader").innerHTML = "";
+        document.getElementById("reader").style.display = "none";
+      }, (errorMessage) => {
+        // ignore errors
+      });
+    }
+
+    function submitForm() {
+      const name = document.getElementById("studentName").value;
+      const book = document.getElementById("bookTitle").value;
+      const action = selectedAction;
+      const timestamp = new Date().toISOString();
+
+      if (!name || !book || !action) {
+        alert("Vyplňte všechna pole!");
+        return;
+      }
+
+      const data = {
+        name,
+        book,
+        action,
+        timestamp
+      };
+
+      console.log("ODESLÁNO:", data);
+
+      alert("Úspěšně odesláno!");
+
+      document.getElementById("studentName").value = "";
+      document.getElementById("bookTitle").value = "";
+      selectedAction = "";
+    }
+  </script>
+</body>
+</html>
