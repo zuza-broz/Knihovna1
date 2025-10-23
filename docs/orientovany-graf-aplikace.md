@@ -1,3 +1,7 @@
+---
+title: Orientovaný graf – aplikace
+---
+
 # Návrh aplikace pro výuku orientovaných ohodnocených grafů
 
 ## Architektura aplikace
